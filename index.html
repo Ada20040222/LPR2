@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ESG 循環維修平台 - 官方網站</title>
+
+<style>
+/* ===== 基礎設定 ===== */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Arial,sans-serif;
+    background:#f3f7f4;
+    color: #2f3e34;
+    line-height: 2;
+}
+
+/* ===== Header ===== */
+header{
+    background:linear-gradient(135deg,#2e7d32,#66bb6a);
+    color:white;
+    padding:25px;
+    box-shadow:0 3px 10px rgba(0,0,0,0.1);
+}
+
+.header-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    width:90%;
+    max-width:1000px;
+    margin:auto;
+}
+
+.logo{
+    font-size:32px;
+    font-weight:bold;
+}
+
+.member-btn{
+    background:white;
+    color:#2e7d32;
+    padding:10px 18px;
+    border-radius:12px;
+    text-decoration:none;
+    font-size:16px;
+    font-weight:bold;
+    transition:0.3s;
+}
+
+.member-btn:hover{
+    background:#e8f5e9;
+}
+
+/* ===== 共用容器 ===== */
+.container{
+    width:90%;
+    max-width:1000px;
+    margin:auto;
+    padding:40px 0;
+}
+
+.card{
+    background:white;
+    padding:30px;
+    border-radius:22px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.08);
+}
+
+/* ===== 按鈕 ===== */
+.btn{
+    background:#43a047;
+    color:white;
+    padding:12px 22px;
+    border:none;
+    border-radius:12px;
+    cursor:pointer;
+    text-decoration:none;
+    transition:0.3s;
+    display:inline-block;
+}
+
+.btn:hover{
+    background:#2e7d32;
+}
+
+.back-btn{
+    margin-bottom:25px;
+}
+
+/* ===== 搜尋與AI輸入框 ===== */
+.search-box{
+    display:flex;
+    gap:15px;
+    flex-wrap:wrap;
+    margin-top:20px;
+}
+
+input{
+    flex:1;
+    font-size:18px;
+    padding:15px;
+    border-radius:12px;
+    border:1px solid #c8e6c9;
+    background:#f9fdf9;
+}
+
+/* ===== 品牌列表 ===== */
+.brand-list{
+    margin-top:30px;
+    display:flex;
+    gap:15px;
+    flex-wrap:wrap;
+}
+
+.brand{
+    background:#e8f5e9;
+    padding:15px 25px;
+    border-radius:12px;
+    color:#2e7d32;
+    font-weight:bold;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.brand:hover{
+    background:#c8e6c9;
+}
+
+/* ===== 列表項目 ===== */
+.item, .option{
+    background:#f9fdf9;
+    padding:20px;
+    border-radius:15px;
+    margin-bottom:15px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    transition:0.3s;
+    border:1px solid #e0f2e9;
+}
+
+.item:hover, .option:hover{
+    transform:translateY(-3px);
+    box-shadow:0 6px 15px rgba(0,0,0,0.08);
+}
+
+.left, .search-header{
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+.left img, .search-header img{
+    width:70px;
+    height:70px;
+    object-fit:cover;
+    border-radius:12px;
+    background:white;
+    border:1px solid #dcedc8;
+    padding:5px;
+}
+
+.left span, .search-name, .health{
+    font-size:20px;
+    font-weight:bold;
+    color:#2e7d32;
+}
+
+.search-content, .price{
+    font-size:16px;
+    line-height:2.5;
+    margin-top:10px;
+}
+
+.product-layout{
+    display:flex;
+    gap:20px;
+    align-items:flex-start;
+    width: 100%;
+}
+
+.product-img{
+    width:120px;
+    height:120px;
+    object-fit:cover;
+    border-radius:12px;
+    border:1px solid #c8e6c9;
+}
+
+.health { font-size: 22px; }
+
+.second-hand { 
+    margin-top:10px; 
+    color:#558b2f; 
+    font-weight:bold; 
+}
+
+/* ===== AI結果區 ===== */
+#aiResult{
+    margin-top:20px;
+    padding:20px;
+    background:#e8f5e9;
+    border-radius:12px;
+    display:none;
+}
+
+/* ===== 手機版 ===== */
+@media(max-width:700px){
+    .header-top { flex-direction: column; gap: 15px; }
+    .item, .product-layout { flex-direction: column; text-align: center; align-items: center; }
+}
+
+/* ===== 粒子背景 ===== */
+#particleCanvas{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    z-index:-1;
+    pointer-events:none;
+}
+
+</style>
+</head>
+
+<body>
+
+<canvas id="particleCanvas"></canvas>
+
+<div id="homePage">
+    <header>
+        <div class="header-top">
+            <div class="logo">ESG 循環維修平台</div>
+            <a href="#" class="member-btn" onclick="showPage('memberPage')">會員中心</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2>搜尋商品</h2>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="輸入 Apple、電腦、電池、螢幕">
+                <button class="btn" onclick="handleSearch()">搜尋</button>
+            </div>
+
+            <h2 style="margin-top:40px;">AI 維修建議</h2>
+            <div class="search-box">
+                <input type="text" id="aiInput" placeholder="例如：iPhone螢幕碎裂怎麼辦？">
+                <button class="btn" onclick="aiAnalyze()">AI 分析</button>
+            </div>
+            <div id="aiResult"></div>
+
+            <h2 style="margin-top:40px;">品牌分類</h2>
+            <div class="brand-list">
+                <div class="brand" onclick="showPage('applePage')">Apple</div>
+                <div class="brand">ASUS</div>
+                <div class="brand">小米</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="searchPage" style="display:none;">
+    <div class="container">
+        <div class="card">
+            <a href="#" class="btn back-btn" onclick="showPage('homePage')">← 返回首頁</a>
+            <h2 style="margin-bottom:20px;">搜尋結果：電腦/相關零件</h2>
+            
+            <div class="option" style="display:block;">
+                <div class="search-header">
+                    <img src="https://files.catbox.moe/m8pmsg.jpg" alt="電池">
+                    <div class="search-name" style="color:green;">電池</div>
+                </div>
+                <div class="search-content">
+                    全新：NT$ 3000<br>
+                    <div class="second-hand">
+                    (二手)</div>
+                    健康度90：NT$ 2200(ESG回饋1點)<br>
+                    健康度80：NT$ 1900(ESG回饋2點)<br>
+                    健康度70：NT$ 1600(ESG回饋3點)
+                </div>
+            </div>
+
+            <div class="option" style="display:block;">
+                <div class="search-header">
+                    <img src="https://files.catbox.moe/4vpq2y.jpg" alt="螢幕">
+                    <div class="search-name" style="color:green;">螢幕</div>
+                </div>
+                <div class="search-content">
+                    全新：NT$ 3000<br>
+                    二手：NT$ 1600 (ESG回饋1點)
+                </div>
+            </div>
+
+            <div class="option" style="display:block;">
+                <div class="search-header">
+                    <img src="https://files.catbox.moe/nyle0m.jpg" alt="變壓器">
+                    <div class="search-name" style="color:green;">變壓器</div>
+                </div>
+                <div class="search-content">
+                    全新：NT$ 1200<br>
+                    二手：NT$ 700 (ESG回饋1點)
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="applePage" style="display:none;">
+    <div class="container">
+        <div class="card">
+            <a href="#" class="btn back-btn" onclick="showPage('homePage')">← 返回首頁</a>
+            <h2 class="title">Apple 維修項目</h2>
+            <div class="item">
+                <div class="left"><img src="https://files.catbox.moe/m8pmsg.jpg"><span>電池</span></div>
+                <button class="btn" onclick="showPage('batteryPage')">查看</button>
+            </div>
+            <div class="item">
+                <div class="left"><img src="https://files.catbox.moe/4vpq2y.jpg"><span>螢幕</span></div>
+                <button class="btn">查看</button>
+            </div>
+ <div class="item">
+                <div class="left"><img src="https://files.catbox.moe/nyle0m.jpg"><span>變壓器</span></div>
+                <button class="btn">查看</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="batteryPage" style="display:none;">
+    <div class="container">
+        <div class="card">
+            <a href="#" class="btn back-btn" onclick="showPage('applePage')">← 返回 Apple</a>
+            <h2 class="title">🔋 電池細部選項</h2>
+
+            <!-- iphone11 -->
+            <div class="option">
+                <div class="product-layout">
+                    <img src="https://files.catbox.moe/c9doxc.jpg" class="product-img">
+                    <div>
+                        <div class="health">iPhone 11 電池</div>
+                        全新：NT$ 4000<br>
+                        <div class="second-hand">(二手)</div>
+
+                        健康度90：NT$ 2200(ESG回饋1點)<br>
+                        健康度80：NT$ 1900(ESG回饋2點)<br>
+                        健康度70：NT$ 1600(ESG回饋3點)
+                    </div>
+                </div>
+            </div>
+
+            <!-- iphone17 -->
+            <div class="option">
+                <div class="product-layout">
+                    <img src="https://files.catbox.moe/tspj10.jpg" class="product-img">
+                    <div>
+                        <div class="health">iPhone 17 電池</div>
+                        全新：NT$ 3500<br>
+                        <div class="second-hand">(二手)</div>
+
+                        健康度90：NT$ 5500(ESG回饋1點)<br>
+                        健康度80：NT$ 4200(ESG回饋2點)<br>
+                        健康度70：NT$ 3800(ESG回饋3點)
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- iphone16 -->
+            <div class="option">
+                <div class="product-layout">
+                    <img src="https://files.catbox.moe/g0tr9v.jpg" class="product-img">
+                    <div>
+                        <div class="health">iPhone 16 電池</div>
+                        全新：NT$ 3200<br>
+                        <div class="second-hand">(二手)</div>
+
+                        健康度90：NT$ 4800(ESG回饋1點)<br>
+                        健康度80：NT$ 3200(ESG回饋2點)<br>
+                        健康度70：NT$ 2800(ESG回饋3點)
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- iphone15 -->
+            <div class="option">
+                <div class="product-layout">
+                    <img src="https://files.catbox.moe/m8pmsg.jpg" class="product-img">
+                    <div>
+                        <div class="health">iPhone 15 電池</div>
+                        全新：NT$ 2800<br>
+                       <div class="second-hand">(二手)</div>
+
+                        健康度90：NT$ 3600(ESG回饋1點)<br>
+                        健康度80：NT$ 2800(ESG回饋2點)<br>
+                        健康度70：NT$ 1900(ESG回饋3點)
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div id="memberPage" style="display:none;">
+    <div class="container">
+        <div class="card">
+
+            <a href="#" class="btn back-btn" onclick="showPage('homePage')">← 返回首頁</a>
+
+            <h2 class="title">會員中心</h2>
+
+            <!-- 基本資料 -->
+            <div class="option" style="display:block;">
+                <h3>👤 基本資料</h3>
+                <p>
+                    姓名：劉玉華<br>
+                    等級：ESG綠色會員
+                </p>
+            </div>
+
+            <!-- ESG點數 -->
+            <div class="option" style="display:block;">
+                <h3>⭐ ESG點數</h3>
+                <p>目前累積：28 點</p>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+/* 頁面切換邏輯 */
+function showPage(pageId) {
+    const pages = ['homePage', 'searchPage', 'applePage', 'batteryPage', 'memberPage'];
+    pages.forEach(id => {
+        document.getElementById(id).style.display = (id === pageId) ? 'block' : 'none';
+    });
+    window.scrollTo(0,0);
+}
+
+/* 搜尋功能整合 */
+function handleSearch() {
+    let kw = document.getElementById("searchInput").value.toLowerCase();
+    if(kw.includes("電腦") || kw.includes("螢幕") || kw.includes("筆電") || kw.includes("變壓器")) {
+        showPage('searchPage');
+    } else if(kw.includes("apple")) {
+        showPage('applePage');
+    } else if(kw.includes("電池")) {
+        showPage('batteryPage');
+    } else {
+        alert("找不到相關商品，試試看搜尋「電腦」或「電池」！");
+    }
+}
+
+/* AI 分析邏輯 */
+function aiAnalyze() {
+    let input = document.getElementById("aiInput").value;
+    let resBox = document.getElementById("aiResult");
+    resBox.style.display = "block";
+    
+    if(input.includes("螢幕")) {
+        resBox.innerHTML = "<h3>Apple Inc. 的螢幕以高解析度與精準色彩著稱，採用 Retina、P3 廣色域與 True Tone 等技術，讓畫面細膩且自然，不論是內建於 Mac、iPhone、iPad，或外接的 Apple Studio Display 與 Pro Display XDR，都強調亮度、對比與色彩一致性，適合從日常使用到專業影像製作等各種需求。<br>AI建議：更換二手螢幕</h3><p>預估省下 NT$3700<br>ESG點數：+2 點</p>";
+    } else if(input.includes("電池")) {
+        resBox.innerHTML = "<h3>iPhone 電池採用鋰離子技術（Lithium-ion），具備充電快、密度高、輕巧且續航久等特性。為確保安全性，建議使用原廠電池，其能與系統完美相容，減少爆炸、過熱風險。通常當電池健康度低於 80% 或明顯耗電時建議更換，平時應維持 20%~80% 電量以延長壽命。<br>AI建議：更換二手電池</h3><p>預估省下 NT$1100<br>ESG點數：+1 點</p>";
+    } else {
+        resBox.innerHTML = "<h3>AI分析中...</h3><p>建議將設備帶至現場檢測，或輸入更具體的故障描述。</p>";
+    }
+}
+
+/* ===== 粒子效果 ===== */
+const canvas = document.getElementById("particleCanvas");
+const ctx = canvas.getContext("2d");
+
+function resize(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener("resize", resize);
+
+// 粒子數量
+let particles = [];
+
+for(let i = 0; i < 70; i++){
+    particles.push({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        r: Math.random() * 2.5 + 1,
+        dx: (Math.random() - 0.5) * 1,
+        dy: (Math.random() - 0.5) * 1
+    });
+}
+
+function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    // 粒子顏色（ESG綠）
+    ctx.fillStyle = "rgba(46,125,50,0.7)";
+    ctx.strokeStyle = "rgba(46,125,50,0.15)";
+
+    // 畫粒子
+    particles.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fill();
+
+        p.x += p.dx;
+        p.y += p.dy;
+
+        // 邊界反彈
+        if(p.x < 0 || p.x > canvas.width) p.dx *= -1;
+        if(p.y < 0 || p.y > canvas.height) p.dy *= -1;
+    });
+
+    // 🔗 連線邏輯（核心）
+    for(let i = 0; i < particles.length; i++){
+        for(let j = i + 1; j < particles.length; j++){
+
+            let dx = particles[i].x - particles[j].x;
+            let dy = particles[i].y - particles[j].y;
+            let dist = Math.sqrt(dx*dx + dy*dy);
+
+            if(dist < 120){ // 距離越小越容易連線
+                ctx.beginPath();
+                ctx.moveTo(particles[i].x, particles[i].y);
+                ctx.lineTo(particles[j].x, particles[j].y);
+
+                ctx.strokeStyle = "rgba(46,125,50," + (1 - dist/120) + ")";
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+        }
+    }
+
+    requestAnimationFrame(draw);
+}
+
+draw();
+
+</script>
+
+</body>
+</html>
